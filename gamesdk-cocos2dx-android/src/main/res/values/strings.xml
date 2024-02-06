@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">GameSdkDemo</string>
+    <!-- AdMob debug app ID: ca-app-pub-3940256099942544~3347511713 -->
+    <string name="admob_app_id" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
+
+    <string name="notify_title">Test Title☕</string>
+    <string name="notify_desc_1">Test Text. This is notify_desc_1!☕</string>
+    <string name="notify_desc_2">Test Text, This is notify_desc_2!☕</string>
+    <string name="notify_channel_id" translatable="false">test notify id</string>
+    <string name="notify_channel_name" translatable="false">test notify name</string>
+    <string name="notify_image_description">Test Image Description</string>
+</resources>

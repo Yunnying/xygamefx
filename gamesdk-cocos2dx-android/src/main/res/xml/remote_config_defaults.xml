@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<defaultsMap>
+    <entry>
+        <key>relive_button_delay</key>
+        <value>3</value>
+    </entry>
+
+    <entry>
+        <key>rate_switch</key>
+        <value>false</value>
+    </entry>
+
+    <entry>
+        <key>classic_adi_cfg</key>
+        <value>1,30</value>
+    </entry>
+
+    <entry>
+        <key>AdLTV_OneDay_Top50Percent</key>
+        <value>0.5</value>
+    </entry>
+
+    <entry>
+        <key>AdLTV_OneDay_Top40Percent</key>
+        <value>0.5</value>
+    </entry>
+
+    <entry>
+        <key>AdLTV_OneDay_Top30Percent</key>
+        <value>0.5</value>
+    </entry>
+
+    <entry>
+        <key>AdLTV_OneDay_Top20Percent</key>
+        <value>0.5</value>
+    </entry>
+
+    <entry>
+        <key>AdLTV_OneDay_Top10Percent</key>
+        <value>0.5</value>
+    </entry>
+</defaultsMap>
