@@ -1,5 +1,4 @@
 package com.shxy.gamesdk.Notification;
-import static org.cocos2dx.lib.Cocos2dxActivity.getContext;
 
 import android.Manifest;
 import android.content.Context;
@@ -40,7 +39,7 @@ public class NotificationManager {
      * @param cancelAfterDays An integer after which days the alarm will be canceled.
      */
     public static void sendAlarmRemind(int[] hours, int beginAfterDays, int cancelAfterDays){
-        Context context = getContext();
+        Context context = mActivity.getApplicationContext();
         if(checkPermission(context, Manifest.permission.POST_NOTIFICATIONS)){
             WakeupAlarmManager.setHours(hours);
             //有权限时发送通知
