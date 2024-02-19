@@ -40,9 +40,9 @@ afterEvaluate {
                 // Applies the component for the release build variant.
                 from components.findByName('release')
                 // You can then customize attributes of the publication as shown below.
-                groupId = 'com.shxy.gamesdk'
-                artifactId = 'common'
-                version = '0.0.1'
+                groupId = 'com.github.Yunnying'
+                artifactId = 'xygamefx'
+                version = '0.0.10-alpha'
             }
         }
     }
