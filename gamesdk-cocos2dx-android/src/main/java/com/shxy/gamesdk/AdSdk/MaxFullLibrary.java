@@ -55,7 +55,7 @@ public class MaxFullLibrary extends BaseFullLibrary {
                 return;
             }
             //如果状态不对，则终止此次广告请求，进行下一个广告请求
-            if ((mInterstitialAd.isReady()) || (mFullAdLoadStatus != AdLoadStatus.als_Unload))
+            if ((mInterstitialAd != null) || (mFullAdLoadStatus != AdLoadStatus.als_Unload))
             {
                 Log.d(TAG, String.format("Full Ad was loading or loaded: %s", mFullAdLoadStatus.toString()));
                 //加载下一个广告
@@ -86,9 +86,8 @@ public class MaxFullLibrary extends BaseFullLibrary {
 
     protected void showFullAd(){
         mActivity.runOnUiThread(() -> {
-            if(!mInterstitialAd.isReady() || AdManager.getRemoveAdMode())
+            if(mInterstitialAd.isReady() || AdManager.getRemoveAdMode())
             {
-                Log.e(TAG, "showFullAd: Full Ad is not ready!");
                 AdManager.loadNextAd();
                 return;
             }
@@ -108,7 +107,7 @@ public class MaxFullLibrary extends BaseFullLibrary {
     //全屏广告是否加载完成
     protected boolean isFullAdLoaded()
     {
-        return  (mFullAdLoadStatus == AdLoadStatus.als_Loaded && mInterstitialAd.isReady());
+        return  (mFullAdLoadStatus == AdLoadStatus.als_Loaded);
     }
 
     class InterstitialAdListener implements MaxAdListener{

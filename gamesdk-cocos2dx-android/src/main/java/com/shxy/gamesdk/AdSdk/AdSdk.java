@@ -47,7 +47,6 @@ public class AdSdk {
      * 初始化AdSDK
      * @param activity 当前的activity
      * @param frameLayout 当前的frameLayout
-     * @param mediationName 广告聚合名称，可使用"Admob"和"AppLovin"
      * @param rewardAdId 激励广告id
      * @param fullAdId 全屏广告id
      * @param bannerAdId 横幅广告id
@@ -64,14 +63,6 @@ public class AdSdk {
     public static void initAds(){
         AdManager.initAds();
     };
-
-    /**
-     * 判断广告内容是否初始化完成
-     * @return true为初始化完成；false为未初始化完成
-     */
-    public static boolean hasInitedAds(){
-        return AdManager.hasInitedAds();
-    }
 
     /**
      * 设置去除广告标记位

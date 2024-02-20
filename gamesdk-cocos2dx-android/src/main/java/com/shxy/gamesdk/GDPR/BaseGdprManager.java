@@ -12,5 +12,6 @@ public abstract class BaseGdprManager {
     protected abstract int getAdLevels();
     protected abstract void startGDPR();
     protected abstract void updateGDPR();
+    protected boolean hasShowedThisTime(){return false;}
     protected void setURL(String privacyPolicyURL, String termsOfServiceURL) {}
 }

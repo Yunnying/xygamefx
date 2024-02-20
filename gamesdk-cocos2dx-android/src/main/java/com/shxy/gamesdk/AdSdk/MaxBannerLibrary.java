@@ -53,6 +53,7 @@ public class MaxBannerLibrary extends BaseBannerLibrary {
             Display display = mActivity.getWindowManager().getDefaultDisplay();
             DisplayMetrics outMetrics = new DisplayMetrics();
             display.getMetrics(outMetrics);
+
             mAdView = new MaxAdView(mBannerAdId, mActivity);
             mAdView.setListener(mBannerAdListener);
             mAdView.setRevenueListener(mBannerAdRevenueListener);
@@ -189,6 +190,7 @@ public class MaxBannerLibrary extends BaseBannerLibrary {
             mBannerTotalFailTimes = 0;
             //修改当前激励广告状态为已加载
             mBannerAdLoadStatus = AdLoadStatus.als_Loaded;
+            showBannerAd(mIsBannerVisible);
             //加载下一个广告
             AdManager.loadNextAd();
             //再次加入到广告队列

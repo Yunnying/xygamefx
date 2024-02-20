@@ -5,8 +5,6 @@ package com.shxy.gamesdk.GDPR;
  * @date: 2023/10/8
  */
 import android.app.Activity;
-import android.util.Log;
-
 import com.shxy.gamesdk.BaseSdk.BaseSdk;
 enum MediationName
 {
@@ -38,20 +36,13 @@ public class GdprSdk {
         if(mediationName.equals("Admob")){
             mGdprManager = new AdmobGdprManager();
             mMediationName = MediationName.m_Admob;
-        }else if (mediationName.equals("AppLovin")) {
+        }else {
             mGdprManager = new MaxGdprManager();
             mMediationName = MediationName.m_AppLovin;
-        }else {
-            Log.e("GdprSdk", "init: Wrong Mediation Name!");
         }
         mGdprManager.init(activity, isDebug);
     }
 
-    /**
-     * 设置隐私政策和服务条款的URL，仅对AppLovin有效
-     * @param privacyPolicyURL 隐私政策的URL
-     * @param termsOfServiceURL 服务条款的URL
-     */
     public static void setURL(String privacyPolicyURL, String termsOfServiceURL){
         if(mMediationName == MediationName.m_AppLovin){
             mGdprManager.setURL(privacyPolicyURL, termsOfServiceURL);
@@ -95,4 +86,10 @@ public class GdprSdk {
     public static int getAdLevels(){
         return mGdprManager.getAdLevels();
     }
+
+    /**
+     * 获取当前是否已经弹出过CMP窗口
+     * @return true：弹出过CMP窗口；false：没有弹出过CMP窗口
+     */
+    public static boolean hasShowedThisTime(){return mGdprManager.hasShowedThisTime();}
 }

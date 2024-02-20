@@ -235,6 +235,8 @@ public class AdmobBannerLibrary extends BaseBannerLibrary
             mBannerTotalFailTimes = 0;
             //修改当前激励广告状态为已加载
             mBannerAdLoadStatus = AdLoadStatus.als_Loaded;
+            showBannerAd(mIsBannerVisible);
+
             if (mAdView != null)
             {
                 mAdView.setOnPaidEventListener(mBannerAdPaidListener);

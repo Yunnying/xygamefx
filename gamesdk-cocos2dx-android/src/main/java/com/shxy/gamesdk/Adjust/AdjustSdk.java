@@ -3,11 +3,13 @@ package com.shxy.gamesdk.Adjust;
 /**
  * @author: 翟宇翔
  * @date: 2023/10/18
+ * Modified at: 2023/12/25
  */
 
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.adjust.sdk.Adjust;
 import com.adjust.sdk.AdjustAdRevenue;
@@ -18,14 +20,18 @@ import com.google.android.gms.ads.AdValue;
 
 
 public class AdjustSdk {
+
+    private static String mInAppPurchaseToken = "";
     /**
      * 初始化Adjust
      * @param application 初始化使用的application
      * @param appToken 应用的appToken
+     * @param inAppPurchaseToken 应用的inAppPuechaseToken
      * @param isDebug 是否开启debug模式
      */
-    public static void init(Application application, String appToken, boolean isDebug){
+    public static void init(Application application, String appToken, String inAppPurchaseToken, boolean isDebug){
         String environment = "";
+        mInAppPurchaseToken = inAppPurchaseToken;
         AdjustConfig config;
         if(isDebug)
         {
@@ -42,7 +48,7 @@ public class AdjustSdk {
     }
 
     /**
-     * 跟踪收益事件
+     * 跟踪Admob收益事件
      * @param adValue Advalue对象
      */
     public static void trackAdRevenue(AdValue adValue){
@@ -52,6 +58,20 @@ public class AdjustSdk {
         Adjust.trackAdRevenue(adRevenue);
     }
 
+    /**
+     * 跟踪收益事件
+     * @param revenue 收益
+     * @param currencyCode 币种
+     */
+    public static void trackPurchaseRevenue(double revenue, String currencyCode){
+        if(mInAppPurchaseToken.isEmpty()){
+            Log.d("AdjustSdk", "trackPurchaseRevenue: Empty InAppPuechaseToken!");
+            return;
+        }
+        AdjustEvent adjustEvent = new AdjustEvent(mInAppPurchaseToken);
+        adjustEvent.setRevenue(revenue,currencyCode);
+        Adjust.trackEvent(adjustEvent);
+    }
     /**
      * 跟踪AppLovin收益事件
      * @param value 收益金额

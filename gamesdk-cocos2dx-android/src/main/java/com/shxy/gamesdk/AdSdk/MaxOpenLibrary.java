@@ -58,7 +58,7 @@ public class MaxOpenLibrary extends BaseOpenLibrary{
                 return;
             }
             //如果状态不对，则终止此次广告请求，进行下一个广告请求
-            if (mOpenAd.isReady() || (mOpenAdLoadStatus != AdLoadStatus.als_Unload))
+            if ((mOpenAd != null) || (mOpenAdLoadStatus != AdLoadStatus.als_Unload))
             {
                 Log.d(TAG, String.format("Open Ad was loading or loaded: %s", mOpenAdLoadStatus.toString()));
                 //加载下一个广告

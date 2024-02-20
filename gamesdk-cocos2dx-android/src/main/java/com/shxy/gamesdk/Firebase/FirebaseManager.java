@@ -79,6 +79,34 @@ public class FirebaseManager
         }
     }
 
+    /**
+     * 测试Task和目前runOnGLThread()方法的兼容性
+     */
+    public static void testTask(){
+        Task<String> task = Tasks.call(new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                // This is where you put your long-running task
+                // For example, a network operation
+                // In this example, just return a simple string
+                return "Hello, world!";
+            }
+        });
+
+        task.addOnCompleteListener(new OnCompleteListener<String>() {
+            @Override
+            public void onComplete(@NonNull Task<String> task) {
+                if (task.isSuccessful()) {
+                    Log.i(TAG,"Task successes.");
+                    FirebaseSdk.onTestTaskFinished();
+                } else {
+                    Log.e(TAG, "Task failed.", task.getException());
+                }
+            }
+        });
+
+    }
+
 /*    //获取版本名称和版本号
     private static void initAppInfo()
     {
@@ -122,9 +150,9 @@ public class FirebaseManager
     }
 
     *//**
- * 是否同时启动
- * @return 为”1“时
- *//*
+     * 是否同时启动
+     * @return 为”1“时
+     *//*
     private static boolean isFirstOpen()
     {
         long lastOpenTime = Cocos2dxHelper.getLongForKey("last_open_time", 0L);
@@ -182,7 +210,7 @@ public class FirebaseManager
             Bundle bundle = new Bundle();
             bundle.putDouble(FirebaseAnalytics.Param.VALUE, value);
             bundle.putString(FirebaseAnalytics.Param.CURRENCY, currencyCode);
-            bundle.putString("ad_format",AdType);
+            bundle.putString(FirebaseAnalytics.Param.AD_FORMAT,AdType);
             bundle.putString("CountryCode",mCountryCode);
             bundle.putInt("Ad_Level",BaseSdk.getIntegerForKey("Ad_Level",-1));
             mFirebaseAnalytics.logEvent(EVENT_AD_REVENUE_IMPRESSION, bundle);
@@ -192,7 +220,7 @@ public class FirebaseManager
             logAdTotalRevenue(value, currencyCode);
         }
     }
-    //（MAX使用） 记录广告收益(Taichi 1.0 Ad_revenue_impression)
+    //（MAX使用） 记录广告收益
     public static void logAdRevenue(double value, String AdType)
     {
         if (mFirebaseAnalytics != null)
@@ -201,7 +229,7 @@ public class FirebaseManager
             Bundle bundle = new Bundle();
             bundle.putDouble(FirebaseAnalytics.Param.VALUE, value);
             bundle.putString(FirebaseAnalytics.Param.CURRENCY, currencyCode);
-            bundle.putString("ad_format",AdType);
+            bundle.putString(FirebaseAnalytics.Param.AD_FORMAT,AdType);
             bundle.putString("CountryCode",mCountryCode);
             bundle.putInt("Ad_Level",BaseSdk.getIntegerForKey("Ad_Level",-1));
             mFirebaseAnalytics.logEvent(EVENT_AD_REVENUE_IMPRESSION, bundle);
@@ -212,18 +240,18 @@ public class FirebaseManager
         }
     }
     //每日初始化Taichi 2.5的数据记录
-    public static void initTaichiDaily(){
+    private static void initTaichiDaily(){
         long curTime = System.currentTimeMillis()/1000L;//获取当前的UNIX时间戳(s)
         long lastUpdateTime = BaseSdk.getLongForKey(KEY_UPDATE_TIME,0L);
         long curZeroTime = curTime - ( curTime % 86400L);
         if ((curTime - lastUpdateTime) / 3600 >= 24){
             BaseSdk.setLongForKey(KEY_UPDATE_TIME, curZeroTime);
             BaseSdk.setFloatForKey(KEY_AD_REVENUE_ONE_DAY, 0.f);
-            BaseSdk.setIntegerForKey(KEY_AD_REVENUE_ONE_DAY, 0);
+            BaseSdk.setIntegerForKey(KEY_TAICHI_LOG_IDX, 0);
         }
     }
     //记录广告收益(Taichi 2.5 AdLTV_OneDay_Top%dPercent)
-    public static void logAdOneDayRevenue(double revenue, String currencyCode)
+    private static void logAdOneDayRevenue(double revenue, String currencyCode)
     {
         if (mFirebaseRemoteConfig == null)
         {
@@ -255,7 +283,7 @@ public class FirebaseManager
         }
     }
     //记录广告收益(Taichi 3.0 Total_Ads_Revenue_001)
-    public static void logAdTotalRevenue(double revenue, String currencyCode)
+    private static void logAdTotalRevenue(double revenue, String currencyCode)
     {
         if (mFirebaseRemoteConfig != null)
         {
