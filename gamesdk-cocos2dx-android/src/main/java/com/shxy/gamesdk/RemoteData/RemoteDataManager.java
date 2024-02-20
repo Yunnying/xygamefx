@@ -160,12 +160,12 @@ public class RemoteDataManager {
             auths.put("Apple", appleId);  // 将"Apple"和appleId添加到auths中
         }
 
-        String googleId = LoginSdk.getUid("google");  // 使用LoginSdk获取Google用户的唯一标识
+        String googleId = LoginSdk.getOpenId(1);  // 使用LoginSdk获取Google用户的唯一标识
         if (googleId!= null) {  // 如果googleId不为空
             auths.put("GP", googleId);  // 将"GP"和googleId添加到auths中
         }
 
-        String facebookId = LoginSdk.getUid("facebook");  // 使用LoginSdk获取Facebook用户的唯一标识
+        String facebookId = LoginSdk.getOpenId(2);  // 使用LoginSdk获取Facebook用户的唯一标识
         if (facebookId!= null) {  // 如果facebookId不为空
             auths.put("FB", facebookId);  // 将"FB"和facebookId添加到auths中
         }

@@ -14,7 +14,6 @@ import android.widget.FrameLayout;
 
 import com.applovin.sdk.AppLovinSdk;
 import com.applovin.sdk.AppLovinSdkConfiguration;
-import com.facebook.ads.AdSettings;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
 import com.shxy.gamesdk.BaseSdk.BaseSdk;
@@ -113,7 +112,7 @@ public class AdManager
             mAdOpenLib = new MaxOpenLibrary();
             mAdOpenLib.initAdOpenLib(activity);
             if(mIsDebug){
-                AdSettings.addTestDevice(testDeviceId);
+                //AdSettings.addTestDevice(testDeviceId);
             }
         }
     }
