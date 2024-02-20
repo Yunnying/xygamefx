@@ -25,23 +25,12 @@ public class FirebaseSdk {
     }
     private static native void onRemoteConfigLoadedNative(); //远程配置加载回调
 
-    public static void onTestTaskFinished(){
-        BaseSdk.runOnGLThread(()->{
-            onTestTaskNative();
-        });
-    }
-
-    private static native void onTestTaskNative();
     /**
      * 初始化FirebaseSdk
      * @param activity 当前activity
      */
     public static void init(Activity activity){
         FirebaseManager.initManager(activity);
-    }
-
-    public static void testTask(){
-        FirebaseManager.testTask();
     }
 
     /**

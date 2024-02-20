@@ -34,8 +34,10 @@ public class MaxGdprManager extends BaseGdprManager{
     private static boolean mIsGDPRCountry = false; //用户是否是欧盟/英国用户
     private static boolean mIsGdprPolicyValid = false;//CMP弹窗是否到达展示时间
     private static boolean mIsDebug = false;
+    private static boolean mHasInitMAX = false;
     private static String mPrivacyPolicyURL = "";
     private static String mTermsOfServiceURL = "";
+    private static boolean mIsFromStartGDPR = false;//本次进入updateGDPR是否为从startGDPR进入的
 
     //需要符合GDPR标准的国家列表
     private static final HashSet<String> GdprCountrySet = new HashSet<String>() {{
@@ -78,12 +80,6 @@ public class MaxGdprManager extends BaseGdprManager{
         mActivity = activity;
         String countryCode = mActivity.getResources().getConfiguration().locale.getCountry();
         mIsGDPRCountry = GdprCountrySet.contains(countryCode);
-        Bundle bundle = new Bundle();
-        bundle.putString("gdpr_user_country",countryCode);
-        FirebaseManager.logParamsEvent("gdpr_user_country",bundle);
-        Bundle bundle1 = new Bundle();
-        bundle1.putBoolean("gdpr_is_country",mIsGDPRCountry);
-        FirebaseManager.logParamsEvent("gdpr_is_country",bundle1);
         setDebug(isDebug);
     }
 
@@ -245,6 +241,7 @@ public class MaxGdprManager extends BaseGdprManager{
                 Log.d(TAG, "begin request GDPR");
                 requestConsentInfoUpdate();
             }else {
+                mIsFromStartGDPR = true;
                 updateGDPR();
             }
 
@@ -256,7 +253,7 @@ public class MaxGdprManager extends BaseGdprManager{
      */
     private void requestConsentInfoUpdate(){
         Log.d(TAG, "requestConsentInfoUpdate: 进入GdprCmpManager");
-        FirebaseManager.logNullParamEvent("gdpr_start_form");
+
         mActivity.runOnUiThread(()->{
             AppLovinSdkSettings settings = new AppLovinSdkSettings( mActivity );
             settings.getTermsAndPrivacyPolicyFlowSettings().setEnabled( true );
@@ -282,22 +279,46 @@ public class MaxGdprManager extends BaseGdprManager{
             sdk.initializeSdk(config->{
                 Log.i(TAG, "requestConsentInfoUpdate: The config is " + config.toString());
                 BaseSdk.setBoolForKey("gdpr_EU_showed", true);
+                mHasInitMAX = true;
                 setAdLevels();
-                Bundle bundle = new Bundle();
-                bundle.putInt("Ad_Level", getAdLevels());
-                bundle.putString("Country_code", config.getCountryCode());
-                FirebaseManager.logParamsEvent("gdpr_start_form_finish",bundle);
+                if(getAdLevels() == -1 && config.getConsentFlowUserGeography() == AppLovinSdkConfiguration.ConsentFlowUserGeography.GDPR){
+                    FirebaseManager.logNullParamEvent("gdpr_start_form");
+                }else{
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("Ad_Level", getAdLevels());
+                    FirebaseManager.logParamsEvent("gdpr_start_form_finish",bundle);
+                }
                 onGDPRCompleted(true);
             });
         });
     }
 
     /**
+     * 用于设置是否已经初始化MAX SDK
+     */
+    public static void setHasInitMax(boolean hasInitMAX) {
+        mHasInitMAX = hasInitMAX;
+    }
+
+    /**
+     * 用于判断是否已经初始化MAX SDK
+     */
+    public static boolean getHasInitMax() {
+        return mHasInitMAX;
+    }
+    /**
      * 在调用updateGDPR前的操作使用，以提前加载GDPR表单，并不进行展示
      */
     protected void updateGDPR(){
         if(mActivity == null || !isGDPRCountry()) {
             return;
+        }
+        if(mIsFromStartGDPR) {
+            //打start点
+            FirebaseManager.logNullParamEvent("gdpr_start_form");
+        }else{
+            //打update点
+            FirebaseManager.logNullParamEvent("gdpr_update_form");
         }
         mActivity.runOnUiThread(()-> {
             AppLovinCmpService cmpService = AppLovinSdk.getInstance( mActivity ).getCmpService();
@@ -308,14 +329,30 @@ public class MaxGdprManager extends BaseGdprManager{
                     setAdLevels();
                     if(appLovinCmpError == null){
                         //成功展示CMP弹窗
+                        if(mIsFromStartGDPR){
+                            //说明是游戏开始时进行的调用，打start点
+                            Bundle bundle = new Bundle();
+                            bundle.putInt("Ad_Level", getAdLevels());
+                            FirebaseManager.logParamsEvent("gdpr_start_form_finish",bundle);
+                            mIsFromStartGDPR = false;
+                        }else{
+                            //说明是游戏中主动进行的调用，打update点
+                            Bundle bundle = new Bundle();
+                            bundle.putInt("Ad_Level", getAdLevels());
+                            FirebaseManager.logParamsEvent("gdpr_update_form_finish",bundle);
+                        }
                         Log.i(TAG, "onCompleted: Update Success!");
-                        Bundle bundle = new Bundle();
-                        bundle.putInt("Ad_Level", getAdLevels());
-                        FirebaseManager.logParamsEvent("gdpr_update_form_finish",bundle);
                         onGDPRCompleted(true);
                     }else{
                         Log.i(TAG, "onCompleted: Update Fail :" + appLovinCmpError.getMessage());
-                        FirebaseManager.logNullParamEvent("gdpr_update_form_exception");
+                        if(mIsFromStartGDPR){
+                            //打start点
+                            FirebaseManager.logNullParamEvent("gdpr_start_form_exception");
+                            mIsFromStartGDPR = false;
+                        }else{
+                            //打update点
+                            FirebaseManager.logNullParamEvent("gdpr_update_form_exception");
+                        }
                         onGDPRCompleted(true);
                     }
                 }
@@ -326,7 +363,9 @@ public class MaxGdprManager extends BaseGdprManager{
     //GDPR操作完成回调
     private void onGDPRCompleted(boolean canSet){
         Log.d(TAG, "onGDPRComplete: 完成GDPR操作");
-        AppLovinSdk.getInstance( mActivity ).showMediationDebugger();//AppLovinSdk的调试器
+        if(mIsDebug){
+            AppLovinSdk.getInstance( mActivity ).showMediationDebugger();//Debug模式下启动AppLovinSdk的调试器
+        }
         GdprSdk.onGDPRShowed(canSet);
     }
 }

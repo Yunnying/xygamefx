@@ -12,12 +12,13 @@ import android.view.Display;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
-import com.applovin.sdk.AppLovinAd;
 import com.applovin.sdk.AppLovinSdk;
 import com.applovin.sdk.AppLovinSdkConfiguration;
+import com.facebook.ads.AdSettings;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
 import com.shxy.gamesdk.BaseSdk.BaseSdk;
+import com.shxy.gamesdk.GDPR.MaxGdprManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -39,7 +40,7 @@ enum MediationName
 
 public class AdManager
 {
-    private static Activity mActivity = null;
+    private static Activity mActivity = null; //
     private static FrameLayout mFrameLayout = null;
     private static MediationName mMediationName = MediationName.m_Admob;//默认为Admob
     private static BaseRewardLibrary mAdRewardLib = null;
@@ -52,6 +53,7 @@ public class AdManager
     private static String mOpenAdId = "ca-app-pub-3940256099942544/9257395921";//开屏广告id，默认值是测试广告
     private static String mBannerAdId = "ca-app-pub-3940256099942544/6300978111";//横幅广告id，默认值是测试广告
     private static boolean mIsDebug = false;
+    private static boolean mHasInitedAds = false;
     private static String TAG = "Ad-Manager";
 
 
@@ -59,7 +61,7 @@ public class AdManager
      * 初始化AdmobSDK
      * @param activity
      * @param frameLayout
-     * @param mediationName 广告聚合商名称
+     * @param mediationName 广告聚合商名称，可使用"Admob"和"AppLovin"
      * @param isDebug 是否开启debug模式
      * @param rewardAdId 奖励广告id
      * @param fullAdId 全屏广告id
@@ -110,30 +112,57 @@ public class AdManager
 
             mAdOpenLib = new MaxOpenLibrary();
             mAdOpenLib.initAdOpenLib(activity);
-
-/*            mAdOpenLib = new AdmobOpenLibrary();
-            mAdOpenLib.initAdOpenLib(activity);*/
+            if(mIsDebug){
+                AdSettings.addTestDevice(testDeviceId);
+            }
         }
     }
 
+    /**
+     * 初始化广告
+     */
     protected static void initAds(){
         if(mAdBannerLib == null || mAdFullLib == null || mAdRewardLib == null){
+            Log.e(TAG, "initAds: You may not initialize Ad SDK!" );
+            return;
+        }
+        if(mHasInitedAds){
+            Log.d(TAG, "initAds: Ads has been initialized!");
             return;
         }
         Log.d(TAG, "initAds: Begin Init Ads");
-        //mAdBannerLib.setWinWidth(winWidth);
         if(mMediationName == MediationName.m_Admob){
             MobileAds.initialize(mActivity,initializationStatus -> {
                 onAdInitComplete();
             });
         } else if (mMediationName == MediationName.m_AppLovin) {
-            mAdRewardLib.initRewardAd();
-            mAdBannerLib.initBannerAd();
-            mAdFullLib.initFullAd();
-            mAdOpenLib.initOpenAd();
             //AppLovin MAX聚合的初始化在CMP完成后自动进行
-            Log.d(TAG, "initAds: For AppLovin Max mediation, the CMP performs its initialization automatically.");
+            if(!MaxGdprManager.getHasInitMax()){
+                Log.d(TAG, "initAds: Init AppLovin Max");
+                AppLovinSdk.getInstance( mActivity ).setMediationProvider( "max" );
+                AppLovinSdk.initializeSdk( mActivity, new AppLovinSdk.SdkInitializationListener() {
+                    @Override
+                    public void onSdkInitialized(final AppLovinSdkConfiguration configuration)
+                    {
+                        mAdRewardLib.initRewardAd();
+                        mAdBannerLib.initBannerAd();
+                        mAdFullLib.initFullAd();
+                        mAdOpenLib.initOpenAd();
+                        onAdInitComplete();
+                    }
+                } );
+            }else{
+                mAdRewardLib.initRewardAd();
+                mAdBannerLib.initBannerAd();
+                mAdFullLib.initFullAd();
+                mAdOpenLib.initOpenAd();
+                Log.d(TAG, "initAds: For AppLovin Max mediation, the CMP performs its initialization automatically.");
+            }
         }
+    }
+
+    protected static boolean hasInitedAds(){
+        return mHasInitedAds;
     }
 
     /**
@@ -144,19 +173,35 @@ public class AdManager
         mIsDebug = isDebug;
     }
 
+    /**
+     * 设置移除广告标志位
+     * @param isRemoveAd true表示移除广告，false表示不移除广告
+     */
     protected static void setRemoveAdMode(boolean isRemoveAd){
         BaseSdk.setBoolForKey("Remove_Ad_Mode",isRemoveAd);
     }
 
+    /**
+     * 获取移除广告标志位
+     * @return true表示移除广告，false表示不移除广告
+     */
     protected static boolean getRemoveAdMode(){
         return BaseSdk.getBoolForKey("Remove_Ad_Mode",false);
     }
-    //admob初始化回调
+    //Ad初始化回调
     protected static void onAdInitComplete()
     {
+        mHasInitedAds = true;
+        if(mMediationName == MediationName.m_AppLovin && mIsDebug){
+            AppLovinSdk.getInstance(mActivity).showMediationDebugger();
+        }
         AdSdk.onAdInitialized();
     }
-    //设置广告是否静音
+
+    /**
+     * 设置广告是否静音
+     * @param enable  true表示广告静音，false表示广告不静音
+     */
     protected static void setAdmobVolumeEnable(boolean enable)
     {
         if (mActivity == null)
@@ -165,7 +210,13 @@ public class AdManager
         }
         mActivity.runOnUiThread(()-> MobileAds.setAppMuted(!enable));
     }
-    //初始化广告id
+
+    /**
+     * 设置广告ID
+     * @param rewardAdId reward广告ID
+     * @param fullAdId full广告ID
+     * @param bannerAdId Banner广告ID
+     */
     protected static void setAdId(String rewardAdId, String fullAdId, String bannerAdId){
         mRewardAdId = rewardAdId;
         mFullAdId = fullAdId;
@@ -179,7 +230,7 @@ public class AdManager
      **/
     protected static String BannerAdId()
     {
-        if (mIsDebug)
+        if (mIsDebug && mMediationName == MediationName.m_Admob)
         {
             return "ca-app-pub-3940256099942544/6300978111";
         }
@@ -195,7 +246,7 @@ public class AdManager
      **/
     protected static String FullAdId()
     {
-        if (mIsDebug)
+        if (mIsDebug && mMediationName == MediationName.m_Admob)
         {
             return "ca-app-pub-3940256099942544/1033173712";
         }
@@ -211,7 +262,7 @@ public class AdManager
      **/
     protected static String RewardAdId()
     {
-        if (mIsDebug)
+        if (mIsDebug && mMediationName == MediationName.m_Admob)
         {
             return "ca-app-pub-3940256099942544/5224354917";
         }
@@ -227,7 +278,7 @@ public class AdManager
      **/
     protected static String AdmobOpenAdId()
     {
-        if (mIsDebug)
+        if (mIsDebug && mMediationName == MediationName.m_Admob)
         {
             return "ca-app-pub-3940256099942544/3419835294";
         }
@@ -299,6 +350,7 @@ public class AdManager
         },5000);
     }
     /** Full Ad Function **/
+    //加载FullAd
     protected static void loadFullAd()
     {
         mActivity.runOnUiThread(() -> {
@@ -308,6 +360,7 @@ public class AdManager
             }
         });
     }
+    //显示FullAd
     protected static void showFullAd()
     {
         mActivity.runOnUiThread(() -> {
@@ -317,6 +370,11 @@ public class AdManager
             }
         });
     }
+
+    /**
+     * 判断FullAd是否正在加载中
+     * @return true表示正在加载中，false表示加载完成
+     */
     protected static boolean isFullAdLoading()
     {
         if (mAdFullLib != null)
@@ -325,6 +383,11 @@ public class AdManager
         }
         return false;
     }
+
+    /**
+     * 判断FullAd是否加载完成
+     * @return true表示加载完成，false表示正在加载中
+     */
     protected static boolean isFullAdLoaded()
     {
         if (mAdFullLib != null)

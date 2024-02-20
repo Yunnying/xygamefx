@@ -36,7 +36,7 @@ public class FacebookLoginManager {
         if(!FacebookSdk.isInitialized()){
             Log.e(TAG, "login: Facebook SDK is not initialized!");
         }
-
+		Log.i(TAG,"Facebook Login!");
         LoginManager.getInstance().setLoginBehavior(LoginBehavior.NATIVE_WITH_FALLBACK);
         LoginManager.getInstance().logInWithReadPermissions(mActivity, Arrays.asList("public_profile", "email"));
         LoginManager.getInstance().registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
@@ -57,7 +57,7 @@ public class FacebookLoginManager {
             @Override
             public void onError(@NonNull FacebookException e) {
                 //登录错误回调
-                Log.e(TAG, "onError: "+ e.getMessage());
+                Log.e(TAG, "Facebook Login onError: "+ e.getMessage());
                 LoginSdk.onLogined("", LoginType.FaceBook.ordinal(),ErrorType.OtherError.ordinal());
             }
         });
@@ -100,6 +100,9 @@ public class FacebookLoginManager {
         LoginManager.getInstance().logOut();
     }
 
+	protected static CallbackManager getFacebookCallbackManager(){
+		return mCallbackManager;
+	}
     /**
      * 删除账户
      */

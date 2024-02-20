@@ -23,7 +23,7 @@ import java.util.Locale;
 
 public class AdmobRewardLibrary extends BaseRewardLibrary
 {
-    private Activity mActivity = null;//cocos2d的Activity
+    private Activity mActivity = null;//Activity
     /** Reward Ad **/
     public static int MAX_REWARD_REQUEST_FAIL_TIMES = 3;//激励广告单轮请求失败的最大次数
     private static final String mRewardAdId = AdManager.RewardAdId();

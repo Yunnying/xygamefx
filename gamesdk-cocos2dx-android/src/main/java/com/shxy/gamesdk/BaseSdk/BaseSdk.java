@@ -3,8 +3,6 @@ package com.shxy.gamesdk.BaseSdk;
 import android.app.Activity;
 import android.content.SharedPreferences;
 
-import com.shxy.gamesdk.BaseSdk.BaseSdk;
-
 import java.util.Map;
 
 /**
@@ -13,14 +11,14 @@ import java.util.Map;
  * 基础SDK，为其他SDK提供本地持久化存储和游戏引擎的交互
  */
 public class BaseSdk {
-    private static Activity sActivity;// 当前的Activity
+    private static Activity mActivity;// 当前的Activity
     private static final String PREFS_NAME = "ShxyGameSDKPrefsFile";// 保存数据的文件名
     /**
      * 初始化方法
      * @param activity 当前的Activity
      */
     public static void init(Activity activity){
-        sActivity = activity;
+        mActivity = activity;
     }
 
     /**
@@ -30,7 +28,7 @@ public class BaseSdk {
      * @return 与指定键关联的布尔值，如果键不存在则返回默认值
      */
     public static boolean getBoolForKey(String key, boolean defaultValue) {
-        SharedPreferences settings = sActivity.getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences settings = mActivity.getSharedPreferences(PREFS_NAME, 0);
         try {
             return settings.getBoolean(key, defaultValue);
         }
@@ -65,7 +63,7 @@ public class BaseSdk {
      * @return 对应键的整数值或默认值
      */
     public static int getIntegerForKey(String key, int defaultValue) {
-        SharedPreferences settings = sActivity.getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences settings = mActivity.getSharedPreferences(PREFS_NAME, 0);
         try {
             return settings.getInt(key, defaultValue);
         }
@@ -99,7 +97,7 @@ public class BaseSdk {
      * @return 键对应的长整型值，如果不存在则返回默认值
      */
     public static long getLongForKey(String key, long defaultValue) {
-        SharedPreferences settings = sActivity.getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences settings = mActivity.getSharedPreferences(PREFS_NAME, 0);
         try {
             return settings.getLong(key, defaultValue);
         }
@@ -133,7 +131,7 @@ public class BaseSdk {
      * @return 对应键名的浮点数值，如果不存在则返回默认值
      */
     public static float getFloatForKey(String key, float defaultValue) {
-        SharedPreferences settings = sActivity.getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences settings = mActivity.getSharedPreferences(PREFS_NAME, 0);
         try {
             return settings.getFloat(key, defaultValue);
         }
@@ -179,7 +177,7 @@ public class BaseSdk {
      * @return 对应键名的字符串数值，如果不存在则返回默认值
      */
     public static String getStringForKey(String key, String defaultValue) {
-        SharedPreferences settings = sActivity.getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences settings = mActivity.getSharedPreferences(PREFS_NAME, 0);
         try {
             return settings.getString(key, defaultValue);
         }
@@ -196,7 +194,7 @@ public class BaseSdk {
      * @param value 值
      */
     public static void setBoolForKey(String key, boolean value) {
-        SharedPreferences settings = sActivity.getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences settings = mActivity.getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean(key, value);
         editor.apply();
@@ -208,7 +206,7 @@ public class BaseSdk {
      * @param value 值
      */
     public static void setIntegerForKey(String key, int value) {
-        SharedPreferences settings = sActivity.getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences settings = mActivity.getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putInt(key, value);
         editor.apply();
@@ -220,7 +218,7 @@ public class BaseSdk {
      * @param value 值
      */
     public static void setLongForKey(String key, long value) {
-        SharedPreferences settings = sActivity.getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences settings = mActivity.getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putLong(key, value);
         editor.apply();
@@ -232,7 +230,7 @@ public class BaseSdk {
      * @param value 值
      */
     public static void setFloatForKey(String key, float value) {
-        SharedPreferences settings = sActivity.getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences settings = mActivity.getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putFloat(key, value);
         editor.apply();
@@ -245,7 +243,7 @@ public class BaseSdk {
      */
     public static void setDoubleForKey(String key, double value) {
         // SharedPreferences doesn't support recording double value
-        SharedPreferences settings = sActivity.getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences settings = mActivity.getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putFloat(key, (float)value);
         editor.apply();
@@ -257,7 +255,7 @@ public class BaseSdk {
      * @param value 值
      */
     public static void setStringForKey(String key, String value) {
-        SharedPreferences settings = sActivity.getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences settings = mActivity.getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(key, value);
         editor.apply();
@@ -268,7 +266,7 @@ public class BaseSdk {
      * @param key 键名
      */
     public static void deleteValueForKey(String key) {
-        SharedPreferences settings = sActivity.getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences settings = mActivity.getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.remove(key);
         editor.apply();

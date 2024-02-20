@@ -170,7 +170,9 @@ public class BillingSdk {
 
     /* -------------------------------------- Billing Init Functions ---------------------------------------*/
     /**
-     * 初始化BillingClient，在使用所有内购方法前应该调用此方法。该方法会在本地建立商品表.
+     * 初始化BillingClient，在使用所有内购方法前应该调用此方法。该方法会在本地建立商品表并且调用 startConnection() 方法尝试与GooglePlay进行连接.
+     * 1. 在连接失败时，除了某些特殊情况外，会重试进行连接，如果在重试后仍然未建立连接，会使用 onConnectionFailedAfterRetries() 进行回调。对于某些特殊情况，会使用 onConnectionFailed(int errorCode) 直接将状态码返回。
+     * 2. 连接成功后，会尝试从GooglePlay获取商品信息，获取失败时会回调 onQueryProductDetailsFailed()。
      * @param activity 初始化所使用的activity
      * @param productIds 以字符串的形式传递产品id，格式为“consumeid1&consumeid2|nonconsumeid1&nonconsumeid2|subscribeid1&subscribeid2”
      */

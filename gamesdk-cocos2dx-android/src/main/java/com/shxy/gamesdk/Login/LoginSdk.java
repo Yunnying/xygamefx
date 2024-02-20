@@ -2,6 +2,7 @@ package com.shxy.gamesdk.Login;
 
 import android.app.Activity;
 
+import com.facebook.CallbackManager;
 import com.shxy.gamesdk.BaseSdk.BaseSdk;
 
 /**
@@ -37,6 +38,9 @@ public class LoginSdk {
         LoginManager.logout(thirdPartyType);
     }
 
+	public static CallbackManager getFacebookCallbackManager(){
+		return FacebookLoginManager.getFacebookCallbackManager();
+	}
     public static void deleteAccount(String thirdPartyType){
 
     }

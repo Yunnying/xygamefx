@@ -64,7 +64,7 @@ public class MaxRewardLibrary extends BaseRewardLibrary{
                 return;
             }
             //如果状态不对，则终止此次广告请求，进行下一个广告请求
-            if((mRewardedAd != null) || (mRewardAdLoadStatus != AdLoadStatus.als_Unload))
+            if((mRewardedAd.isReady()) || (mRewardAdLoadStatus != AdLoadStatus.als_Unload))
             {
                 Log.d(TAG, String.format("Reward Ad was loading or loaded: %s", mRewardAdLoadStatus.toString()));
                 //加载下一个广告
@@ -103,6 +103,7 @@ public class MaxRewardLibrary extends BaseRewardLibrary{
         mActivity.runOnUiThread(() -> {
             if (!mRewardedAd.isReady())
             {
+                Log.e(TAG, "showRewardAd: Reward Ad is not ready!");
                 return;
             }
             try {
@@ -121,7 +122,7 @@ public class MaxRewardLibrary extends BaseRewardLibrary{
     //激励广告是否加载完成
     protected boolean isRewardAdLoaded()
     {
-        return (mRewardAdLoadStatus == AdLoadStatus.als_Loaded);
+        return (mRewardAdLoadStatus == AdLoadStatus.als_Loaded && mRewardedAd.isReady());
     }
 
 
@@ -135,6 +136,8 @@ public class MaxRewardLibrary extends BaseRewardLibrary{
          */
         @Override
         public void onUserRewarded(@NonNull MaxAd maxAd, @NonNull MaxReward maxReward) {
+
+            Log.d(TAG, "Reward Ad shown Success");
 
             AdSdk.onRewardAdViewed();
             //加载下一个广告
@@ -187,6 +190,7 @@ public class MaxRewardLibrary extends BaseRewardLibrary{
          */
         @Override
         public void onAdHidden(@NonNull MaxAd maxAd) {
+            Log.d(TAG, "Reward Ad hidden");
             //用户关闭了广告
             AdManager.loadNextAd();
             //准备新一个激励广告

@@ -3,6 +3,7 @@ package com.shxy.gamesdk.RemoteData;
 import android.util.Base64;
 import android.util.Log;
 
+import com.shxy.gamesdk.BaseSdk.BaseSdk;
 import com.shxy.gamesdk.Login.LoginSdk;
 
 import org.json.JSONException;
@@ -48,7 +49,8 @@ public class RemoteDataManager {
      */
     protected static void init(String url, String appId) {
         REMOTE_DATA_URL = url;
-        REMOTE_APP_ID = appId;//从本地获取数据
+        REMOTE_APP_ID = appId;
+        mRemoteUserDataStr = BaseSdk.getStringForKey("userRemoteData","");//从本地获取数据
     }
 
     /**
@@ -122,6 +124,7 @@ public class RemoteDataManager {
                 }
                 mRemoteUserDataStr = result.toString();
                 Log.i(TAG, "onGetUserData: mRemoteUserDataStr is " + mRemoteUserDataStr);
+                BaseSdk.setStringForKey("userRemoteData", mRemoteUserDataStr);//更新本地数据
             } else if(responseCode == 404) {
                 //返回404，说明不存在这个用户
                 Log.i(TAG, "onGetUserData: This user doesn't exist!");
@@ -151,18 +154,18 @@ public class RemoteDataManager {
         String url = String.format("%s/api/Players/SaveV2?appid=%s&uid=%s", REMOTE_DATA_URL, REMOTE_APP_ID, playerId);
         Log.i(TAG, "postUserData: The url is " + url);
         HashMap<String, String> auths = new HashMap<>();
-        //String appleId = LoginSdk.getUid(0);  // 使用LoginSdk获取Apple用户的唯一标识
+        //String appleId = LoginSdk.getUid("apple");  // 使用LoginSdk获取Apple用户的唯一标识
         String appleId = "testappleid1";//测试使用
         if (appleId!= null) {  // 如果appleId不为空
             auths.put("Apple", appleId);  // 将"Apple"和appleId添加到auths中
         }
 
-        String googleId = LoginSdk.getOpenId(2);  // 使用LoginSdk获取Google用户的唯一标识
+        String googleId = LoginSdk.getUid("google");  // 使用LoginSdk获取Google用户的唯一标识
         if (googleId!= null) {  // 如果googleId不为空
             auths.put("GP", googleId);  // 将"GP"和googleId添加到auths中
         }
 
-        String facebookId = LoginSdk.getOpenId(1);  // 使用LoginSdk获取Facebook用户的唯一标识
+        String facebookId = LoginSdk.getUid("facebook");  // 使用LoginSdk获取Facebook用户的唯一标识
         if (facebookId!= null) {  // 如果facebookId不为空
             auths.put("FB", facebookId);  // 将"FB"和facebookId添加到auths中
         }
@@ -170,7 +173,7 @@ public class RemoteDataManager {
         // 创建 JSON 数据
         String jsonData = createJson(data, properties, auths);
         // 生成签名
-        String signature = generateSignature("66daf9132e309783a6766d47fe462d89", "POST", jsonData, REMOTE_APP_ID, playerId);
+        String signature = generateSignature("", "POST", jsonData, REMOTE_APP_ID, playerId);
 
         sendRequest(url, "POST", jsonData, signature, new OnResult() {
             @Override
@@ -227,7 +230,8 @@ public class RemoteDataManager {
         }
         String url = String.format("%s/api/Players/DeleteById?appid=%s&uid=%s", REMOTE_DATA_URL, REMOTE_APP_ID, uid);
         Log.i(TAG, "deleteUserData: The url is " + url);
-        String signature = generateSignature("66daf9132e309783a6766d47fe462d89", "DELETE","", REMOTE_APP_ID, uid);//删除时body为空
+        BaseSdk.deleteValueForKey("userRemoteData");
+        String signature = generateSignature("", "DELETE","", REMOTE_APP_ID, uid);//删除时body为空
         sendRequest(url, "DELETE", null, signature, new OnResult() {
             @Override
             public void onSuccess(HttpURLConnection connection) {
@@ -456,6 +460,7 @@ public class RemoteDataManager {
                             result.append(line);
                         }
                         mRemoteUserDataStr = result.toString();
+                        BaseSdk.setStringForKey("userRemoteData", mRemoteUserDataStr);
                     }
                     Log.i(TAG, "sendRequest: Success!");
                     onResult.onSuccess(connection);
@@ -552,7 +557,6 @@ public class RemoteDataManager {
         try{
             json.put("id", defaultStringValue);
             json.put("name", defaultStringValue);
-
             json.put("distinct_Id", defaultStringValue);
             json.put("lastLoginIP", defaultStringValue);
             json.put("uuid", defaultStringValue);
