@@ -3,6 +3,9 @@ plugins {
     id 'maven-publish'
 }
 
+group = 'com.github.Yunnying'
+version = '0.0.11-alpha'
+
 android {
     namespace 'com.shxy.gamesdk'
     compileSdk 34
@@ -42,7 +45,7 @@ afterEvaluate {
                 // You can then customize attributes of the publication as shown below.
                 groupId = 'com.github.Yunnying'
                 artifactId = 'xygamefx'
-                version = '0.0.10-alpha'
+                version = '0.0.11-alpha'
             }
         }
     }
