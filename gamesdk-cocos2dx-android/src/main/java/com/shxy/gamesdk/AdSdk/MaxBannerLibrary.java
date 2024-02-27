@@ -257,13 +257,13 @@ public class MaxBannerLibrary extends BaseBannerLibrary {
             {
                 FirebaseManager.logNullParamEvent("adb_paid_0");
             }
-            //开启子线程上报广告收益到Adjust
-            Runnable runnable = () -> {
+            //开启子线程上报广告收益到Adjust（MAX后台已经上报，注释）
+/*            Runnable runnable = () -> {
                 Log.d(TAG, "Banner AdjustAdRevenue");
                 AdjustSdk.trackAdRevenue(value);
             };
             Thread thread = new Thread(runnable, "BannerAdThread");
-            thread.start();
+            thread.start();*/
         }
     }
 

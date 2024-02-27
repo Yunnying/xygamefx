@@ -199,19 +199,19 @@ public class MaxOpenLibrary extends BaseOpenLibrary{
             double value = maxAd.getRevenue();
             Log.d(TAG, String.format(Locale.getDefault(),"Open onPaidEvent: %f USD", value));
             //上报Firebase(Taichi 1.0, 1.0自动调用2.5和3.0)
-            FirebaseManager.logAdRevenue(value,"open");
+            FirebaseManager.logAdRevenue(value,"APPopen");
             //Firebase事件记录
             if (value <= 0)
             {
                 FirebaseManager.logNullParamEvent("adb_paid_0");
             }
-            //开启子线程上报广告收益到Adjust
-            Runnable runnable = () -> {
+            //开启子线程上报广告收益到Adjust（MAX后台已经上报，注释）
+/*            Runnable runnable = () -> {
                 Log.d(TAG, "Open AdjustAdRevenue");
                 AdjustSdk.trackAdRevenue(value);
             };
             Thread thread = new Thread(runnable, "OpenAdThread");
-            thread.start();
+            thread.start();*/
         }
     }
 }

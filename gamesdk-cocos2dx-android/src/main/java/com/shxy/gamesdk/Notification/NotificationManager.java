@@ -1,6 +1,7 @@
 package com.shxy.gamesdk.Notification;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -8,8 +9,6 @@ import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
-import android.app.Activity;
 
 /**
  * @author: 翟宇翔

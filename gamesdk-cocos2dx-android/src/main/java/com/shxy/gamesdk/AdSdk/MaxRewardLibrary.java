@@ -270,13 +270,13 @@ public class MaxRewardLibrary extends BaseRewardLibrary{
             {
                 FirebaseManager.logNullParamEvent("adv_paid_0");
             }
-            //开启子线程上报广告收益到Adjust
-            Runnable runnable = () -> {
+            //开启子线程上报广告收益到Adjust（MAX后台已经上报，注释）
+/*            Runnable runnable = () -> {
                 Log.d(TAG, "Reward AdjustAdRevenue");
                 AdjustSdk.trackAdRevenue(value);
             };
             Thread thread = new Thread(runnable, "RewardAdThread");
-            thread.start();
+            thread.start();*/
         }
     }
 }

@@ -15,33 +15,96 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.TextView;
+
 import androidx.core.app.NotificationCompat;
-
-
-import com.shxy.gamesdk.R;
 
 import java.util.Calendar;
 
 /**
  * Created by allen on 6/30/2017.
  * modified by Yuxiang_Zhai on 9/15/2023.
+ * modified by zhaiyx on 2/21/2024.
  */
 
 
 public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
+        String pkName = context.getPackageName();
         int[] hours = new int[]{8, 18};
+        int resIDNotifyTime1 = context.getResources().getIdentifier("notify_time_1", "integer",pkName);
+        int resIDNotifyTime2 = context.getResources().getIdentifier("notify_time_2", "integer",pkName);
+        if(resIDNotifyTime1 != 0){
+            hours[0] = context.getResources().getInteger(resIDNotifyTime1);
+            Log.i("AlarmReceiver", "onReceive: The hours_0 is "+ hours[0]);
+        }
+        if(resIDNotifyTime2 != 0){
+            hours[1] = context.getResources().getInteger(resIDNotifyTime2);
+            Log.i("AlarmReceiver", "onReceive: The hours_1 is "+ hours[1]);
+        }
+        final String TAG = "AlarmReceiver";
         if(intent != null && intent.hasExtra("customHours")){
             hours = intent.getIntArrayExtra("customHours");
         }
 
-        final int NOTIFY_ID = 1001;
-        final String CHANNEL_ID = context.getString(R.string.notify_channel_id);
-        final String CHANNEL_NAME = context.getString(R.string.notify_channel_name);
-        final String NOTIFY_TITLE = context.getString(R.string.notify_title);
-        String NOTIFY_DESC = context.getString(R.string.notify_desc_1);
-        final String TAG = "Alarm";
+        //从主模块获取通知的相关信息
+        //获取包名
+        Log.i("AlarmReceiver", "onReceive: The packageName is "+ pkName);
+        //获取CHANNEL_ID
+        int resIDChannelId = context.getResources().getIdentifier("notify_channel_id", "string",pkName);
+        String CHANNEL_ID = "";
+        if(resIDChannelId != 0){
+            CHANNEL_ID = context.getString(resIDChannelId);
+            Log.i("AlarmReceiver", "onReceive: The CHANNEL_ID is "+ CHANNEL_ID);
+        }else{
+            Log.e("AlarmReceiver", "onReceive: The CHANNEL_ID is null");
+        }
+        //获取CHANNEL_NAME
+        int resIDChannelName = context.getResources().getIdentifier("notify_channel_name", "string",pkName);
+        String CHANNEL_NAME = "";
+        if(resIDChannelName != 0){
+            CHANNEL_NAME = context.getString(resIDChannelName);
+            Log.i("AlarmReceiver", "onReceive: The CHANNEL_NAME is "+ CHANNEL_NAME);
+        }else{
+            Log.e("AlarmReceiver", "onReceive: The CHANNEL_NAME is null");
+        }
+        //获取NOTIFY_TITLE
+        int resIDNotifyTitle = context.getResources().getIdentifier("notify_title", "string",pkName);
+        String NOTIFY_TITLE = "";
+        if(resIDNotifyTitle != 0){
+            NOTIFY_TITLE = context.getString(resIDNotifyTitle);
+            Log.i("AlarmReceiver", "onReceive: The NOTIFY_TITLE is "+ NOTIFY_TITLE);
+        }else{
+            Log.e("AlarmReceiver", "onReceive: The NOTIFY_TITLE is null");
+        }
+        //获取NOTIFY_DESC
+        int resIDNotifyDesc1 = context.getResources().getIdentifier("notify_desc_1", "string",pkName);
+        int resIDNotifyDesc2 = context.getResources().getIdentifier("notify_desc_2", "string",pkName);
+        String NOTIFY_DESC = "";
+        if(resIDNotifyDesc1 != 0){
+            NOTIFY_DESC = context.getString(resIDNotifyDesc1);
+            Log.i("AlarmReceiver", "onReceive: The NOTIFY_DESC is "+ NOTIFY_DESC);
+        }else{
+            Log.e("AlarmReceiver", "onReceive: The NOTIFY_DESC is null");
+        }
+
+        //获取通知布局
+        int resIDNotifyLayout = context.getResources().getIdentifier("notify_layout", "layout",pkName);
+        if(resIDNotifyLayout == 0){
+            Log.e("AlarmReceiver", "onReceive: The NotifyLayout is null");
+        }
+        //获取通知标题
+        int resIDNotificationTitle = context.getResources().getIdentifier("notification_title", "id",pkName);
+        if(resIDNotificationTitle == 0){
+            Log.e("AlarmReceiver", "onReceive: The NotificationTitle is null");
+        }
+        //获取通知的小图标
+        int resIDSmallIcon = context.getResources().getIdentifier("notify_small_icon", "drawable",pkName);
+        if(resIDSmallIcon == 0){
+            Log.e("AlarmReceiver", "onReceive: The SmallIcon is null");
+        }
+
+
 
         //判断当前处于哪个时间点
         Calendar mCalendar = Calendar.getInstance();
@@ -49,19 +112,18 @@ public class AlarmReceiver extends BroadcastReceiver {
         //根据当前时间点确定加载通知的样式
         int id = (curHour==hours[0]) ? 0 : 1;
         int[] notification_desc_ids = new int[]{
-                R.string.notify_desc_1,
-                R.string.notify_desc_2
+                resIDNotifyDesc1,
+                resIDNotifyDesc2
         };
 
         CharSequence notification_desc = context.getText(notification_desc_ids[id]);
         Log.d(TAG, "onReceive: Id is " + id);
         Intent appIntent = new Intent("Activity.ENTER");
-        appIntent.putExtra("isFromNotification", "yes");
+        appIntent.putExtra("isFromNotification", true);
         appIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, appIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        RemoteViews notificationLayout = new RemoteViews(context.getPackageName(), R.layout.notify_layout);
-        Log.d(TAG, "onReceive: Package Name is "+context.getPackageName());
-        notificationLayout.setTextViewText(R.id.notification_title, notification_desc);
+        RemoteViews notificationLayout = new RemoteViews(pkName, resIDNotifyLayout);
+        notificationLayout.setTextViewText(resIDNotificationTitle, notification_desc);
         notification_desc.length();
 
         final DisplayMetrics dm = context.getApplicationContext().getResources().getDisplayMetrics();
@@ -73,16 +135,16 @@ public class AlarmReceiver extends BroadcastReceiver {
         TextPaint textPaint = textView.getPaint();
         float textPaintWidth = textPaint.measureText(notification_desc.toString());
         if (textPaintWidth > dm.widthPixels * 1.5f){
-            notificationLayout.setTextViewTextSize(R.id.notification_title, COMPLEX_UNIT_SP, 14);
+            notificationLayout.setTextViewTextSize(resIDNotificationTitle, COMPLEX_UNIT_SP, 14);
             Log.d("AlarmReceiver", "COMPLEX_UNIT_SP 14");
         }
         else{
-            notificationLayout.setTextViewTextSize(R.id.notification_title, COMPLEX_UNIT_SP, 18);
+            notificationLayout.setTextViewTextSize(resIDNotificationTitle, COMPLEX_UNIT_SP, 18);
             Log.d("AlarmReceiver", "COMPLEX_UNIT_SP 18");
         }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.notify_small_icon) //设置小图标
+                .setSmallIcon(resIDSmallIcon) //设置小图标
                 .setCustomContentView(notificationLayout)
                 .setPriority(NotificationCompat.PRIORITY_HIGH) //设置优先级
                 .setContentIntent(pendingIntent)//点击跳转到应用
@@ -90,7 +152,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         Notification notify = null;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            builder.setChannelId((String) context.getText(R.string.notify_channel_id));
+            builder.setChannelId((String) context.getText(resIDChannelId));
         }
         notify = builder.build();
 
@@ -100,8 +162,8 @@ public class AlarmReceiver extends BroadcastReceiver {
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             manager.createNotificationChannel(new NotificationChannel(
-                    (String)context.getText(R.string.notify_channel_id),
-                    context.getText(R.string.notify_channel_name), NotificationManager.IMPORTANCE_HIGH));
+                    (String)context.getText(resIDChannelId),
+                    context.getText(resIDChannelName), NotificationManager.IMPORTANCE_HIGH));
         }
         manager.notify(1001, notify);
         WakeupAlarmManager.sendRemindByHours(context,hours);
