@@ -1,0 +1,12 @@
+//指定Protobuf版本
+syntax = "proto3";
+
+package userData;
+
+message User {
+    map<string, string> stringData = 1;
+    map<string, int32> intData = 2;
+    map<string,double> doubleData = 3;
+    map<string, int64> longData = 4;
+    map<string,bool> boolData = 5;
+}

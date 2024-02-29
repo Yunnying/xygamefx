@@ -19,7 +19,7 @@ public class NotificationManager {
     private static String TAG = "NotificationManager";
     protected static void init(Activity Activity){
         mActivity = Activity;
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !checkPermission(mActivity.getApplicationContext(), Manifest.permission.POST_NOTIFICATIONS)) {
             ActivityCompat.requestPermissions(mActivity,new String[]{Manifest.permission.POST_NOTIFICATIONS},1);
         }
     }

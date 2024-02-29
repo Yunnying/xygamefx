@@ -137,7 +137,7 @@ public class AdjustSdk {
     /**
      * 向 Google 提供许可数据 (《数字市场法案》合规)
      */
-    public static void trackThirdPartySharing(boolean isEEAUser, boolean canUsePersonalizedData, boolean canUseUserData){
+    private static void trackThirdPartySharing(boolean isEEAUser, boolean canUsePersonalizedData, boolean canUseUserData){
         AdjustThirdPartySharing adjustThirdPartySharing = new AdjustThirdPartySharing(null);
         adjustThirdPartySharing.addGranularOption("google_dma", "eea", (isEEAUser)?"1":"0");
         adjustThirdPartySharing.addGranularOption("google_dma", "ad_personalization", (canUsePersonalizedData)?"1":"0");
